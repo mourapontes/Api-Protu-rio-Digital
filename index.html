@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prontuário Digital</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Carrega a biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Prontuário Digital do Paciente</h1>
+        <form id="formulario">
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" placeholder="Digite o nome completo" required>
+            </div>
+            <div class="form-group">
+                <label for="dataNascimento">Data de Nascimento:</label>
+                <input type="date" id="dataNascimento" required>
+            </div>
+            <div class="form-group">
+                <label>Sexo:</label>
+                <div class="sexo-options">
+                    <label for="masculino">
+                        <input type="radio" id="masculino" name="sexo" value="Masculino" required> Masculino
+                    </label>
+                    <label for="feminino">
+                        <input type="radio" id="feminino" name="sexo" value="Feminino" required> Feminino
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="unidadeSaude">Nome da Unidade de Saúde:</label>
+                <input type="text" id="unidadeSaude" placeholder="Digite o nome da unidade de saúde" required>
+            </div>
+            <div class="form-group">
+                <label for="peso">Peso (kg):</label>
+                <input type="number" id="peso" min="0" step="0.01" placeholder="Ex: 70.50" required>
+            </div>
+            <div class="form-group">
+                <label for="altura">Altura (m):</label>
+                <input type="number" id="altura" min="0" step="0.01" placeholder="Ex: 1.75" required>
+            </div>
+            <div class="form-group">
+                <label for="pressaoSistolica">Pressão Sistólica (mmHg):</label>
+                <input type="number" id="pressaoSistolica" min="0" placeholder="Ex: 120" required>
+            </div>
+            <div class="form-group">
+                <label for="pressaoDiastolica">Pressão Diastólica (mmHg):</label>
+                <input type="number" id="pressaoDiastolica" min="0" placeholder="Ex: 80" required>
+            </div>
+            <div class="form-group">
+                <label for="glicemia">Glicemia (mg/dL):</label>
+                <input type="number" id="glicemia" min="0" placeholder="Ex: 90" required>
+            </div>
+            <div class="form-group">
+                <label for="temperatura">Temperatura (°C):</label>
+                <input type="number" id="temperatura" min="0" step="0.1" placeholder="Ex: 36.5" required>
+            </div>
+            <div class="button-group">
+                <button type="button" onclick="calcular()">Calcular</button>
+                <button type="reset">Limpar</button>
+                <button type="button" id="salvarPDF">Salvar em PDF</button>
+            </div>
+        </form>
+        <div id="resultados">
+            <h2>Resultados:</h2>
+            <div id="resultado-imc"></div>
+            <div id="resultado-pressao"></div>
+            <div id="resultado-glicemia"></div>
+            <div id="resultado-temperatura"></div>
+            <div id="diagnostico"></div>
+        </div>
+    </div>
+    <!-- Inclui o arquivo JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
