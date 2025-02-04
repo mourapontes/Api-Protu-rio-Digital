@@ -1,6 +1,5 @@
 let jsPDFIsReady = false;
 
-// Função para verificar se o jsPDF está pronto
 function jsPDFReady() {
     jsPDFIsReady = true;
     const botaoSalvarPDF = document.getElementById('salvarPDF');
@@ -11,69 +10,60 @@ function jsPDFReady() {
     }
 }
 
-// Função para calcular a idade a partir da data de nascimento
-function calcularIdade(dataNascimento) {
-    const hoje = new Date();
-    const nascimento = new Date(dataNascimento);
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const mes = hoje.getMonth() - nascimento.getMonth();
-
-    // Ajusta a idade se o aniversário ainda não ocorreu este ano
-    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-        idade--;
-    }
-
-    return idade;
-}
-
-// Função para calcular os resultados
 function calcular() {
     try {
         const nome = document.getElementById('nome').value.trim();
-        const dataNascimento = document.getElementById('dataNascimento').value;
-        const sexo = document.querySelector('input[name="sexo"]:checked')?.value;
-        const peso = parseFloat(document.getElementById('peso').value);
-        const altura = parseFloat(document.getElementById('altura').value);
-        const pressaoSistolica = parseInt(document.getElementById('pressaoSistolica').value);
-        const pressaoDiastolica = parseInt(document.getElementById('pressaoDiastolica').value);
-        const glicemia = parseInt(document.getElementById('glicemia').value);
-        const temperatura = parseFloat(document.getElementById('temperatura').value);
+        const idade = parseInt(document.getElementById('idade').value);
+        const sexo = document.querySelector('input[name="sexo"]:checked')?.value || "Dados não definidos";
+        const peso = parseFloat(document.getElementById('peso').value) || "Dados não definidos";
+        const altura = parseFloat(document.getElementById('altura').value) || "Dados não definidos";
+        const pressaoSistolica = parseInt(document.getElementById('pressaoSistolica').value) || "Dados não definidos";
+        const pressaoDiastolica = parseInt(document.getElementById('pressaoDiastolica').value) || "Dados não definidos";
+        const glicemia = parseInt(document.getElementById('glicemia').value) || "Dados não definidos";
+        const temperatura = parseFloat(document.getElementById('temperatura').value) || "Dados não definidos";
         const unidadeSaude = document.getElementById('unidadeSaude').value.trim();
+        const cidade = document.getElementById('cidade').value.trim() || "Dados não definidos";
+        const estado = document.getElementById('estado').value.trim() || "Dados não definidos";
 
-        if (!nome || !dataNascimento || !sexo || isNaN(peso) || isNaN(altura) || isNaN(pressaoSistolica) || isNaN(pressaoDiastolica) || isNaN(glicemia) || isNaN(temperatura) || !unidadeSaude) {
-            throw new Error("Por favor, preencha todos os campos corretamente.");
+        // Validação dos campos obrigatórios
+        if (!nome || isNaN(idade) || !unidadeSaude) {
+            throw new Error("Por favor, preencha os campos obrigatórios: Nome, Idade e Unidade de Saúde.");
         }
 
-        // Validar data de nascimento
-        if (!isValidDate(dataNascimento)) {
-            throw new Error("Data de nascimento inválida. Use o formato YYYY-MM-DD.");
-        }
-
-        // Validar valores numéricos positivos
-        if (peso <= 0 || altura <= 0 || pressaoSistolica <= 0 || pressaoDiastolica <= 0 || glicemia <= 0 || temperatura <= 0) {
-            throw new Error("Por favor, insira valores positivos para peso, altura, pressão, glicemia e temperatura.");
-        }
-
-        // Calcular a idade
-        const idade = calcularIdade(dataNascimento);
-
-        // Obter a data e hora atual
+        // Captura a data e hora atual
         const dataAtual = new Date();
         const dataFormatada = dataAtual.toLocaleDateString('pt-BR');
         const horaFormatada = dataAtual.toLocaleTimeString('pt-BR');
 
-        const imc = peso / (altura * altura);
-        const classificacaoIMC = classificarIMC(imc);
-        const classificacaoPressao = classificarPressao(pressaoSistolica, pressaoDiastolica);
-        const classificacaoGlicemia = classificarGlicemia(glicemia);
-        const classificacaoTemperatura = classificarTemperatura(temperatura);
+        // Cálculo do IMC (se peso e altura forem fornecidos)
+        let imc = "Dados não definidos";
+        let classificacaoIMC = "Dados não definidos";
+        if (typeof peso === "number" && typeof altura === "number" && altura > 0) {
+            imc = (peso / (altura * altura)).toFixed(2);
+            classificacaoIMC = classificarIMC(imc);
+        }
 
-        document.getElementById('resultado-imc').textContent = `IMC: ${imc.toFixed(2)} - ${classificacaoIMC}`;
+        // Classificações (se dados forem fornecidos)
+        const classificacaoPressao = (typeof pressaoSistolica === "number" && typeof pressaoDiastolica === "number")
+            ? classificarPressao(pressaoSistolica, pressaoDiastolica)
+            : "Dados não definidos";
+
+        const classificacaoGlicemia = (typeof glicemia === "number")
+            ? classificarGlicemia(glicemia)
+            : "Dados não definidos";
+
+        const classificacaoTemperatura = (typeof temperatura === "number")
+            ? classificarTemperatura(temperatura)
+            : "Dados não definidos";
+
+        // Exibe os resultados na tela
+        document.getElementById('resultado-imc').textContent = `IMC: ${imc} - ${classificacaoIMC}`;
         document.getElementById('resultado-pressao').textContent = `Pressão Arterial: ${classificacaoPressao}`;
         document.getElementById('resultado-glicemia').textContent = `Glicemia: ${classificacaoGlicemia}`;
         document.getElementById('resultado-temperatura').textContent = `Temperatura: ${classificacaoTemperatura}`;
 
-        let diagnostico = `Paciente ${nome}, ${idade} anos, do sexo ${sexo}, nascido em ${formatarData(dataNascimento)}, `;
+        // Monta o diagnóstico
+        let diagnostico = `Paciente ${nome}, ${idade} anos, do sexo ${sexo}, `;
         diagnostico += `com ${classificacaoIMC.toLowerCase()}, `;
         diagnostico += `pressão arterial ${classificacaoPressao.toLowerCase()}, `;
         diagnostico += `glicemia ${classificacaoGlicemia.toLowerCase()} e `;
@@ -81,17 +71,19 @@ function calcular() {
 
         document.getElementById('diagnostico').textContent = diagnostico;
 
-        // Salvar dados para o PDF
+        // Salva os dados para o PDF
         window.dadosPDF = {
             nome,
-            dataNascimento: formatarData(dataNascimento),
+            idade,
             sexo,
-            imc: `IMC: ${imc.toFixed(2)} - ${classificacaoIMC}`,
+            imc: `IMC: ${imc} - ${classificacaoIMC}`,
             pressao: `Pressão Arterial: ${classificacaoPressao}`,
             glicemia: `Glicemia: ${classificacaoGlicemia}`,
             temperatura: `Temperatura: ${classificacaoTemperatura}`,
             diagnostico,
             unidadeSaude,
+            cidade,
+            estado,
             dataAtendimento: dataFormatada,
             horaAtendimento: horaFormatada
         };
@@ -100,7 +92,6 @@ function calcular() {
     }
 }
 
-// Função para classificar o IMC
 function classificarIMC(imc) {
     if (imc < 18.5) return "Abaixo do Peso";
     if (imc < 25) return "Peso Normal";
@@ -110,7 +101,6 @@ function classificarIMC(imc) {
     return "Obesidade Grau III";
 }
 
-// Função para classificar a pressão arterial
 function classificarPressao(sistolica, diastolica) {
     if (sistolica < 120 && diastolica < 80) return "Ótima";
     if (sistolica < 130 && diastolica < 85) return "Normal";
@@ -121,7 +111,6 @@ function classificarPressao(sistolica, diastolica) {
     return "Indefinida";
 }
 
-// Função para classificar a glicemia
 function classificarGlicemia(glicemia) {
     if (glicemia >= 70 && glicemia <= 99) return "Normal";
     if (glicemia >= 100 && glicemia <= 125) return "Pré-diabetes";
@@ -129,36 +118,12 @@ function classificarGlicemia(glicemia) {
     return "Hipotensão";
 }
 
-// Função para classificar a temperatura
 function classificarTemperatura(temperatura) {
     if (temperatura < 36) return "Hipotermia";
     if (temperatura <= 37.5) return "Normal";
     return "Febre";
 }
 
-// Função para formatar a data
-function formatarData(data) {
-    const partes = data.split('-');
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-}
-
-// Função para validar a data
-function isValidDate(dateString) {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!regex.test(dateString)) return false;
-
-    const parts = dateString.split('-');
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const day = parseInt(parts[2], 10);
-
-    if (month < 1 || month > 12 || day < 1 || day > 31) return false;
-
-    const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-}
-
-// Função para salvar o PDF
 function salvarPDF() {
     try {
         if (!jsPDFIsReady) {
@@ -175,23 +140,25 @@ function salvarPDF() {
 
         doc.setFontSize(12);
         doc.text(`Unidade de Saúde: ${dados.unidadeSaude}`, 14, 30);
-        doc.text(`Data do Atendimento: ${dados.dataAtendimento}`, 14, 40);
-        doc.text(`Hora do Atendimento: ${dados.horaAtendimento}`, 14, 50);
+        doc.text(`Cidade: ${dados.cidade}`, 14, 40);
+        doc.text(`Estado: ${dados.estado}`, 14, 50);
+        doc.text(`Data do Atendimento: ${dados.dataAtendimento}`, 14, 60);
+        doc.text(`Hora do Atendimento: ${dados.horaAtendimento}`, 14, 70);
 
-        doc.text(`Nome: ${dados.nome}`, 14, 65);
-        doc.text(`Data de Nascimento: ${dados.dataNascimento}`, 14, 75);
-        doc.text(`Sexo: ${dados.sexo}`, 14, 85);
+        doc.text(`Nome: ${dados.nome}`, 14, 85);
+        doc.text(`Idade: ${dados.idade} anos`, 14, 95);
+        doc.text(`Sexo: ${dados.sexo}`, 14, 105);
 
-        doc.text(dados.imc, 14, 100);
-        doc.text(dados.pressao, 14, 110);
-        doc.text(dados.glicemia, 14, 120);
-        doc.text(dados.temperatura, 14, 130);
+        doc.text(dados.imc, 14, 120);
+        doc.text(dados.pressao, 14, 130);
+        doc.text(dados.glicemia, 14, 140);
+        doc.text(dados.temperatura, 14, 150);
 
         doc.setFontSize(14);
-        doc.text("Diagnóstico:", 14, 145);
+        doc.text("Diagnóstico:", 14, 165);
         doc.setFontSize(12);
         const textLines = doc.splitTextToSize(dados.diagnostico, 180);
-        doc.text(textLines, 14, 155);
+        doc.text(textLines, 14, 175);
 
         doc.save("prontuario_paciente.pdf");
     } catch (error) {
@@ -199,5 +166,4 @@ function salvarPDF() {
     }
 }
 
-// Garante que o jsPDF está pronto após o carregamento da página
 window.onload = jsPDFReady;
