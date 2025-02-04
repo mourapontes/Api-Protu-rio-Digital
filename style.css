@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #f4f4f9, #e0e0f5);
     color: #333;
     display: flex;
@@ -14,13 +14,14 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    line-height: 1.6;
 }
 
 .container {
     background-color: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -28,23 +29,23 @@ body {
 
 .container:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
     text-align: center;
     margin-bottom: 25px;
-    font-size: 28px;
+    font-size: 32px;
     color: #007bff;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.5px;
 }
 
 h2 {
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 20px;
     color: #444;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .form-group {
@@ -59,16 +60,22 @@ label {
     font-size: 14px;
 }
 
+.required::after {
+    content: " *";
+    color: red;
+}
+
 input[type="text"],
 input[type="number"],
 input[type="date"] {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 16px;
     margin-top: 5px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f9f9f9;
 }
 
 input[type="text"]:focus,
@@ -76,7 +83,8 @@ input[type="number"]:focus,
 input[type="date"]:focus {
     border-color: #007bff;
     outline: none;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.25);
+    background-color: #fff;
 }
 
 /* Estilo para o grupo de opções de sexo */
@@ -89,13 +97,20 @@ input[type="date"]:focus {
 .sexo-options label {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-weight: normal;
+    gap: 8px;
+    font-weight: 500;
     cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.sexo-options label:hover {
+    color: #007bff;
 }
 
 .sexo-options input[type="radio"] {
     margin: 0;
+    accent-color: #007bff;
 }
 
 .button-group {
@@ -109,16 +124,18 @@ button {
     background: linear-gradient(135deg, #007bff, #0056b3);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
     flex: 1;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
     background: linear-gradient(135deg, #0056b3, #003d80);
     transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 button[type="reset"] {
@@ -174,11 +191,11 @@ button[type="reset"]:hover {
     }
 
     h1 {
-        font-size: 24px;
+        font-size: 28px;
     }
 
     h2 {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .sexo-options {
