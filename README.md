@@ -10,4 +10,4 @@ O arquivo index.html é o principal, contendo o formulário e a interface.
 O style.css define a aparência visual, e o script.js realiza os cálculos.
 A biblioteca jsPDF é utilizada para a geração do arquivo PDF.
 O sistema foi feito para fins educativos e não substitui a avaliação de um profissional de saúde. 
-Link do API:
+Link do API:https://mourapontes.github.io/Api-Protu-rio-Digital/
