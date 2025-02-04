@@ -38,8 +38,9 @@ function calcular() {
         const pressaoDiastolica = parseInt(document.getElementById('pressaoDiastolica').value);
         const glicemia = parseInt(document.getElementById('glicemia').value);
         const temperatura = parseFloat(document.getElementById('temperatura').value);
+        const unidadeSaude = document.getElementById('unidadeSaude').value.trim();
 
-        if (!nome || !dataNascimento || !sexo || isNaN(peso) || isNaN(altura) || isNaN(pressaoSistolica) || isNaN(pressaoDiastolica) || isNaN(glicemia) || isNaN(temperatura)) {
+        if (!nome || !dataNascimento || !sexo || isNaN(peso) || isNaN(altura) || isNaN(pressaoSistolica) || isNaN(pressaoDiastolica) || isNaN(glicemia) || isNaN(temperatura) || !unidadeSaude) {
             throw new Error("Por favor, preencha todos os campos corretamente.");
         }
 
@@ -55,6 +56,11 @@ function calcular() {
 
         // Calcular a idade
         const idade = calcularIdade(dataNascimento);
+
+        // Obter a data e hora atual
+        const dataAtual = new Date();
+        const dataFormatada = dataAtual.toLocaleDateString('pt-BR');
+        const horaFormatada = dataAtual.toLocaleTimeString('pt-BR');
 
         const imc = peso / (altura * altura);
         const classificacaoIMC = classificarIMC(imc);
@@ -74,6 +80,21 @@ function calcular() {
         diagnostico += `temperatura ${classificacaoTemperatura.toLowerCase()}.`;
 
         document.getElementById('diagnostico').textContent = diagnostico;
+
+        // Salvar dados para o PDF
+        window.dadosPDF = {
+            nome,
+            dataNascimento: formatarData(dataNascimento),
+            sexo,
+            imc: `IMC: ${imc.toFixed(2)} - ${classificacaoIMC}`,
+            pressao: `Pressão Arterial: ${classificacaoPressao}`,
+            glicemia: `Glicemia: ${classificacaoGlicemia}`,
+            temperatura: `Temperatura: ${classificacaoTemperatura}`,
+            diagnostico,
+            unidadeSaude,
+            dataAtendimento: dataFormatada,
+            horaAtendimento: horaFormatada
+        };
     } catch (error) {
         alert(error.message);
     }
@@ -147,124 +168,6 @@ function salvarPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        const nome = document.getElementById('nome').value;
-        const dataNascimento = document.getElementById('dataNascimento').value;
-        const sexo = document.querySelector('input[name="sexo"]:checked')?.value;
-        const imc = document.getElementById('resultado-imc').textContent;
-        const pressao = document.getElementById('resultado-pressao').textContent;
-        const glicemia = document.getElementById('resultado-glicemia').textContent;
-        const temperatura = document.getElementById('resultado-temperatura').textContent;
-        const diagnostico = document.getElementById('diagnostico').textContent;
-
-        doc.setFontSize(18);
-        doc.text("Prontuário Digital do Paciente", 14, 20);
-
-        doc.setFontSize(12);
-        doc.text(`Nome: ${nome}`, 14, 35);
-        doc.text(`Data de Nascimento: ${formatarData(dataNascimento)}`, 14, 45);
-        doc.text(`Sexo: ${sexo}`, 14, 55);
-
-        doc.text(imc, 14, 70);
-        doc.text(pressao, 14, 80);
-        doc.text(glicemia, 14, 90);
-        doc.text(temperatura, 14, 100);
-
-        doc.setFontSize(14);
-        doc.text("Diagnóstico:", 14, 115);
-        doc.setFontSize(12);
-        const textLines = doc.splitTextToSize(diagnostico, 180);
-        doc.text(textLines, 14, 125);
-
-        doc.save("prontuario_paciente.pdf");
-    } catch (error) {
-        alert("Erro ao gerar o PDF: " + error.message);
-    }
-}
-
-// Garante que o jsPDF está pronto após o carregamento da página
-window.onload = jsPDFReady;
-function calcular() {
-    try {
-        const nome = document.getElementById('nome').value.trim();
-        const dataNascimento = document.getElementById('dataNascimento').value;
-        const sexo = document.querySelector('input[name="sexo"]:checked')?.value;
-        const peso = parseFloat(document.getElementById('peso').value);
-        const altura = parseFloat(document.getElementById('altura').value);
-        const pressaoSistolica = parseInt(document.getElementById('pressaoSistolica').value);
-        const pressaoDiastolica = parseInt(document.getElementById('pressaoDiastolica').value);
-        const glicemia = parseInt(document.getElementById('glicemia').value);
-        const temperatura = parseFloat(document.getElementById('temperatura').value);
-        const unidadeSaude = document.getElementById('unidadeSaude').value.trim();
-
-        if (!nome || !dataNascimento || !sexo || isNaN(peso) || isNaN(altura) || isNaN(pressaoSistolica) || isNaN(pressaoDiastolica) || isNaN(glicemia) || isNaN(temperatura) || !unidadeSaude) {
-            throw new Error("Por favor, preencha todos os campos corretamente.");
-        }
-
-        // Validar data de nascimento
-        if (!isValidDate(dataNascimento)) {
-            throw new Error("Data de nascimento inválida. Use o formato YYYY-MM-DD.");
-        }
-
-        // Validar valores numéricos positivos
-        if (peso <= 0 || altura <= 0 || pressaoSistolica <= 0 || pressaoDiastolica <= 0 || glicemia <= 0 || temperatura <= 0) {
-            throw new Error("Por favor, insira valores positivos para peso, altura, pressão, glicemia e temperatura.");
-        }
-
-        // Calcular a idade
-        const idade = calcularIdade(dataNascimento);
-
-        // Obter a data e hora atual
-        const dataAtual = new Date();
-        const dataFormatada = dataAtual.toLocaleDateString('pt-BR');
-        const horaFormatada = dataAtual.toLocaleTimeString('pt-BR');
-
-        const imc = peso / (altura * altura);
-        const classificacaoIMC = classificarIMC(imc);
-        const classificacaoPressao = classificarPressao(pressaoSistolica, pressaoDiastolica);
-        const classificacaoGlicemia = classificarGlicemia(glicemia);
-        const classificacaoTemperatura = classificarTemperatura(temperatura);
-
-        document.getElementById('resultado-imc').textContent = `IMC: ${imc.toFixed(2)} - ${classificacaoIMC}`;
-        document.getElementById('resultado-pressao').textContent = `Pressão Arterial: ${classificacaoPressao}`;
-        document.getElementById('resultado-glicemia').textContent = `Glicemia: ${classificacaoGlicemia}`;
-        document.getElementById('resultado-temperatura').textContent = `Temperatura: ${classificacaoTemperatura}`;
-
-        let diagnostico = `Paciente ${nome}, ${idade} anos, do sexo ${sexo}, nascido em ${formatarData(dataNascimento)}, `;
-        diagnostico += `com ${classificacaoIMC.toLowerCase()}, `;
-        diagnostico += `pressão arterial ${classificacaoPressao.toLowerCase()}, `;
-        diagnostico += `glicemia ${classificacaoGlicemia.toLowerCase()} e `;
-        diagnostico += `temperatura ${classificacaoTemperatura.toLowerCase()}.`;
-
-        document.getElementById('diagnostico').textContent = diagnostico;
-
-        // Salvar dados para o PDF
-        window.dadosPDF = {
-            nome,
-            dataNascimento: formatarData(dataNascimento),
-            sexo,
-            imc: `IMC: ${imc.toFixed(2)} - ${classificacaoIMC}`,
-            pressao: `Pressão Arterial: ${classificacaoPressao}`,
-            glicemia: `Glicemia: ${classificacaoGlicemia}`,
-            temperatura: `Temperatura: ${classificacaoTemperatura}`,
-            diagnostico,
-            unidadeSaude,
-            dataAtendimento: dataFormatada,
-            horaAtendimento: horaFormatada
-        };
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-function salvarPDF() {
-    try {
-        if (!jsPDFIsReady) {
-            throw new Error("A biblioteca jsPDF ainda não foi carregada.");
-        }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
         const dados = window.dadosPDF;
 
         doc.setFontSize(18);
@@ -295,3 +198,6 @@ function salvarPDF() {
         alert("Erro ao gerar o PDF: " + error.message);
     }
 }
+
+// Garante que o jsPDF está pronto após o carregamento da página
+window.onload = jsPDFReady;
